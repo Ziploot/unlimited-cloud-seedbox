@@ -300,17 +300,17 @@ function getHtmlDashboard() {
         
         let fileItems = "";
         t.files.forEach(f => {
-          fileItems += \`
+          fileItems += `
             <div class="file-item">
               <span>📁 \${f.name} (\${f.size} MB)</span>
               <div>
                 <a href="/stream/\${t.infoHash}/\${f.index}" target="_blank">Stream/Download</a>
               </div>
             </div>
-          \`;
+          `;
         });
 
-        item.innerHTML = \`
+        item.innerHTML = `
           <div class="torrent-header">
             <span class="torrent-title">⚡ \${t.name || 'Loading Metadata...'}</span>
             <button class="btn-delete" onclick="deleteTorrent('\${t.infoHash}')">Remove</button>
@@ -326,7 +326,7 @@ function getHtmlDashboard() {
           <div class="file-list">
             \${fileItems}
           </div>
-        \`;
+        `;
         listDiv.appendChild(item);
       });
     }
