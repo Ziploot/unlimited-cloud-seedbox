@@ -302,9 +302,9 @@ function getHtmlDashboard() {
         t.files.forEach(f => {
           fileItems += `
             <div class="file-item">
-              <span>📁 \${f.name} (\${f.size} MB)</span>
+              <span>📁 ${f.name} (${f.size} MB)</span>
               <div>
-                <a href="/stream/\${t.infoHash}/\${f.index}" target="_blank">Stream/Download</a>
+                <a href="/stream/${t.infoHash}/${f.index}" target="_blank">Stream/Download</a>
               </div>
             </div>
           `;
@@ -313,15 +313,15 @@ function getHtmlDashboard() {
         item.innerHTML = `
           <div class="torrent-header">
             <span class="torrent-title">⚡ \${t.name || 'Loading Metadata...'}</span>
-            <button class="btn-delete" onclick="deleteTorrent('\${t.infoHash}')">Remove</button>
+            <button class="btn-delete" onclick="deleteTorrent('${t.infoHash}')">Remove</button>
           </div>
           <div class="stats">
-            <span>Peers: \${t.numPeers}</span>
-            <span>Speed: \${t.downloadSpeed} MB/s</span>
-            <span>Progress: \${t.progress}%</span>
+            <span>Peers: ${t.numPeers}</span>
+            <span>Speed: ${t.downloadSpeed} MB/s</span>
+            <span>Progress: ${t.progress}%</span>
           </div>
           <div class="progress-bar-wrapper">
-            <div class="progress-bar" style="width: \${t.progress}%"></div>
+            <div class="progress-bar" style="width: ${t.progress}%"></div>
           </div>
           <div class="file-list">
             \${fileItems}
@@ -333,7 +333,7 @@ function getHtmlDashboard() {
 
     async function deleteTorrent(infoHash) {
       if (confirm("Remove this torrent from cloud?")) {
-        await fetch(\`/api/delete/\${infoHash}\`, { method: "DELETE" });
+        await fetch(`/api/delete/${infoHash}`, { method: 'DELETE' });
         loadStatus();
       }
     }
