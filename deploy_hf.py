@@ -30,7 +30,7 @@ try:
     repo_id = f"{username}/unlimited-cloud-seedbox"
     print(f"\n[DEPLOY] Creating public Hugging Face Space: {repo_id}...")
     try:
-        create_repo(repo_id=repo_id, repo_type="space", sdk="docker", private=False, token=token)
+        create_repo(repo_id=repo_id, repo_type="space", space_sdk="docker", private=False, token=token)
     except Exception as e:
         print(f"[INFO] Space already exists or initialized: {e}")
 
