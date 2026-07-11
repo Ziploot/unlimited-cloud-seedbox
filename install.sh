@@ -11,28 +11,22 @@ mkdir -p "$PROJECT_DIR"
 curl -sL "https://raw.githubusercontent.com/Ziploot/unlimited-cloud-seedbox/main/index.js" -o "$PROJECT_DIR/index.js"
 curl -sL "https://raw.githubusercontent.com/Ziploot/unlimited-cloud-seedbox/main/package.json" -o "$PROJECT_DIR/package.json"
 curl -sL "https://raw.githubusercontent.com/Ziploot/unlimited-cloud-seedbox/main/Dockerfile" -o "$PROJECT_DIR/Dockerfile"
+curl -sL "https://raw.githubusercontent.com/Ziploot/unlimited-cloud-seedbox/main/deploy_hf.py" -o "$PROJECT_DIR/deploy_hf.py"
 curl -sL "https://raw.githubusercontent.com/Ziploot/unlimited-cloud-seedbox/main/README.md" -o "$PROJECT_DIR/README.md"
 
 cd "$PROJECT_DIR"
 
 echo ""
 echo "=============================================="
-echo "⚡ OPTION 1: 1-Click Cloud Deployment (Hugging Face Spaces)"
+echo "⚡ OPTION 1: 1-Click Automated Cloud Deployment (Hugging Face)"
 echo "=============================================="
-echo "Deploy to the cloud in 10 seconds for `$0:"
-echo "1. Log into Hugging Face."
-echo "2. Duplicate this template space:"
-echo "   -> https://huggingface.co/spaces/Ziploot/unlimited-cloud-seedbox?duplicate=true"
-echo "3. Set the space to PRIVATE and click Duplicate."
-echo ""
+read -p "[INPUT] Do you want to automatically deploy this Seedbox to Hugging Face Cloud? (y/n): " DEPLOY_CLOUD
 
-read -p "[INPUT] Do you want to open the 1-Click Cloud Duplication page now? (y/n): " OPEN_CLOUD
-if [ "$OPEN_CLOUD" = "y" ] || [ "$OPEN_CLOUD" = "Y" ]; then
-    if command -v xdg-open > /dev/null; then
-        xdg-open "https://huggingface.co/spaces/Ziploot/unlimited-cloud-seedbox?duplicate=true"
-    elif command -v open > /dev/null; then
-        open "https://huggingface.co/spaces/Ziploot/unlimited-cloud-seedbox?duplicate=true"
-    fi
+if [ "$DEPLOY_CLOUD" = "y" ] || [ "$DEPLOY_CLOUD" = "Y" ]; then
+    echo -e "
+[DEPLOY] Running automated Hugging Face deployer script..."
+    python3 deploy_hf.py
+    exit 0
 fi
 
 echo ""
