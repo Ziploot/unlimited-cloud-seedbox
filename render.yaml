@@ -3,5 +3,8 @@ services:
     name: unlimited-cloud-seedbox
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install --ignore-scripts
     startCommand: node index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.10.0
