@@ -56,7 +56,7 @@ try {
         Start-Sleep -Seconds 2
 
         Write-Host "`n[BROWSER] Opening Local Seedbox Dashboard..." -ForegroundColor Cyan
-        Start-Process "http://localhost:3000"
+        Start-Process "http://localhost:7860"
         
         Write-Host "`n[SUCCESS] Local Seedbox Server is running in the background!" -ForegroundColor Green
         Write-Host "To start it manually later, run 'npm start' in: $projectFolder"
