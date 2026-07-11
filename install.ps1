@@ -23,7 +23,7 @@ try {
     Write-Host "`n==============================================" -ForegroundColor Green
     Write-Host "⚡ OPTION 1: 1-Click Cloud Deployment (Hugging Face Spaces)" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
-    Write-Host "The absolute easiest way! Deploy to the cloud in 10 seconds for $0:" -ForegroundColor Cyan
+    Write-Host "The absolute easiest way! Deploy to the cloud in 10 seconds for `$0:" -ForegroundColor Cyan
     Write-Host "1. Log into Hugging Face (or sign up for free)."
     Write-Host "2. Click this template link to duplicate the space:"
     Write-Host "   -> https://huggingface.co/spaces/Ziploot/unlimited-cloud-seedbox?duplicate=true" -ForegroundColor Green
