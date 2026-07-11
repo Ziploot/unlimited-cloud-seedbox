@@ -15,29 +15,22 @@ try {
     # Copy files
     Copy-Item -Path "$scriptDir\index.js" -Destination "$projectFolder\index.js" -Force
     Copy-Item -Path "$scriptDir\package.json" -Destination "$projectFolder\package.json" -Force
-    Copy-Item -Path "$scriptDir\Dockerfile" -Destination "$projectFolder\Dockerfile" -Force
-    Copy-Item -Path "$scriptDir\deploy_hf.py" -Destination "$projectFolder\deploy_hf.py" -Force
+    Copy-Item -Path "$scriptDir\render.yaml" -Destination "$projectFolder\render.yaml" -Force
     Copy-Item -Path "$scriptDir\README.md" -Destination "$projectFolder\README.md" -Force
 
     Set-Location $projectFolder
 
     Write-Host "`n==============================================" -ForegroundColor Green
-    Write-Host "⚡ OPTION 1: 1-Click Automated Cloud Deployment (Hugging Face)" -ForegroundColor Green
+    Write-Host "⚡ OPTION 1: 1-Click Cloud Deployment (Render - $0 Free Hosting)" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
-    $deployCloud = Read-Host "[INPUT] Do you want to automatically deploy this Seedbox to Hugging Face Cloud? (Y/N)"
-    
-    if ($deployCloud -eq "Y" -or $deployCloud -eq "y") {
-        # Check Python is installed
-        $pythonInstalled = Get-Command python -ErrorAction SilentlyContinue
-        if (-not $pythonInstalled) {
-            Write-Host "[WARN] Python not detected. Installing Python via winget..." -ForegroundColor Yellow
-            winget install Python.Python.3 --silent --accept-package-agreements --accept-source-agreements
-        }
-        
-        Write-Host "`n[DEPLOY] Running automated Hugging Face deployer script..." -ForegroundColor Cyan
-        python deploy_hf.py
-        Read-Host "`nCloud Setup completed! Press Enter to exit..."
-        Exit
+    Write-Host "The absolute easiest way! Deploy to the cloud in 10 seconds for `$0:" -ForegroundColor Cyan
+    Write-Host "1. Log into Render (or sign up for free)."
+    Write-Host "2. The script will open the 1-Click deploy page."
+    Write-Host "3. Click 'Create Web Service' and your seedbox will be live in 1 minute!" -ForegroundColor Green
+
+    $openCloud = Read-Host "`n[INPUT] Do you want to open the 1-Click Render Deployment page now? (Y/N)"
+    if ($openCloud -eq "Y" -or $openCloud -eq "y") {
+        Start-Process "https://render.com/deploy?repo=https://github.com/Ziploot/unlimited-cloud-seedbox"
     }
 
     Write-Host "`n==============================================" -ForegroundColor Green
@@ -58,12 +51,12 @@ try {
         cmd.exe /c "npm install"
 
         Write-Host "`n[START] Launching Local Seedbox Server..." -ForegroundColor Cyan
-        # Start the node server in a hidden background window (default port 7860)
+        # Start the node server in a hidden background window (default port 3000)
         Start-Process -FilePath "node" -ArgumentList "index.js" -WorkingDirectory $projectFolder -WindowStyle Hidden
         Start-Sleep -Seconds 2
 
         Write-Host "`n[BROWSER] Opening Local Seedbox Dashboard..." -ForegroundColor Cyan
-        Start-Process "http://localhost:7860"
+        Start-Process "http://localhost:3000"
         
         Write-Host "`n[SUCCESS] Local Seedbox Server is running in the background!" -ForegroundColor Green
         Write-Host "To start it manually later, run 'npm start' in: $projectFolder"
