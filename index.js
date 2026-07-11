@@ -2,6 +2,7 @@ const express = require('express');
 const torrentStream = require('torrent-stream');
 const os = require('os');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 7860;
@@ -26,7 +27,7 @@ app.post('/api/add', (req, res) => {
   const { magnet } = req.body;
   if (!magnet) return res.status(400).json({ error: 'Magnet link is required' });
 
-  const id = Buffer.from(magnet).toString('base64').slice(0, 24).replace(/[+/=]/g, '_');
+  const id = crypto.createHash('md5').update(magnet).digest('hex');
 
   if (engines.has(id)) {
     return res.json(getEngineMetadata(id, engines.get(id)));
@@ -230,7 +231,7 @@ function getHtmlDashboard() {
             fileItems='<div style="color:#64748b;font-size:13px;padding:10px 0;">⏳ Searching for peers and fetching metadata...</div>';
           }
           const errorHtml = t.error ? '<div style="color:#ef4444;font-size:13px;margin-bottom:10px;">⚠️ '+t.error+'</div>' : '';
-          item.innerHTML='<div class="torrent-header"><span class="torrent-title">⚡ '+t.name+'</span><button class="btn-delete" onclick="deleteTorrent(\''+t.id+'\')">Remove</button></div>'+errorHtml+'<div class="stats"><span>Peers: '+t.numPeers+'</span><span>Speed: '+t.downloadSpeed+' MB/s</span><span>Progress: '+t.progress+'%</span></div><div class="progress-bar-wrapper"><div class="progress-bar" style="width:'+t.progress+'%"></div></div><div class="file-list">'+fileItems+'</div>';
+          item.innerHTML='<div class="torrent-header"><span class="torrent-title">⚡ '+t.name+'</span><button class="btn-delete" onclick="deleteTorrent(\\\''+t.id+'\\\')">Remove</button></div>'+errorHtml+'<div class="stats"><span>Peers: '+t.numPeers+'</span><span>Speed: '+t.downloadSpeed+' MB/s</span><span>Progress: '+t.progress+'%</span></div><div class="progress-bar-wrapper"><div class="progress-bar" style="width:'+t.progress+'%"></div></div><div class="file-list">'+fileItems+'</div>';
           listDiv.appendChild(item);
         });
       } catch(e) { console.error('Status poll error:', e); }
