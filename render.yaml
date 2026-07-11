@@ -3,7 +3,7 @@ services:
     name: unlimited-cloud-seedbox
     env: node
     plan: free
-    buildCommand: npm install --ignore-scripts
+    buildCommand: npm install
     startCommand: node index.js
     envVars:
       - key: NODE_VERSION
