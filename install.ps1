@@ -16,24 +16,28 @@ try {
     Copy-Item -Path "$scriptDir\index.js" -Destination "$projectFolder\index.js" -Force
     Copy-Item -Path "$scriptDir\package.json" -Destination "$projectFolder\package.json" -Force
     Copy-Item -Path "$scriptDir\Dockerfile" -Destination "$projectFolder\Dockerfile" -Force
+    Copy-Item -Path "$scriptDir\deploy_hf.py" -Destination "$projectFolder\deploy_hf.py" -Force
     Copy-Item -Path "$scriptDir\README.md" -Destination "$projectFolder\README.md" -Force
 
     Set-Location $projectFolder
 
     Write-Host "`n==============================================" -ForegroundColor Green
-    Write-Host "⚡ OPTION 1: 1-Click Cloud Deployment (Hugging Face Spaces)" -ForegroundColor Green
+    Write-Host "⚡ OPTION 1: 1-Click Automated Cloud Deployment (Hugging Face)" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
-    Write-Host "The absolute easiest way! Deploy to the cloud in 10 seconds for `$0:" -ForegroundColor Cyan
-    Write-Host "1. Log into Hugging Face (or sign up for free)."
-    Write-Host "2. Click this template link to duplicate the space:"
-    Write-Host "   -> https://huggingface.co/spaces/Ziploot/unlimited-cloud-seedbox?duplicate=true" -ForegroundColor Green
-    Write-Host "3. Set the space visibility to PRIVATE (so your downloads remain private) and click Duplicate."
-    Write-Host "4. Done! Your private seedbox is active and running in the cloud!" -ForegroundColor Green
-
-    # Automating the browser launch for duplication
-    $openCloud = Read-Host "`n[INPUT] Do you want to open the 1-Click Cloud Duplication page now? (Y/N)"
-    if ($openCloud -eq "Y" -or $openCloud -eq "y") {
-        Start-Process "https://huggingface.co/spaces/Ziploot/unlimited-cloud-seedbox?duplicate=true"
+    $deployCloud = Read-Host "[INPUT] Do you want to automatically deploy this Seedbox to Hugging Face Cloud? (Y/N)"
+    
+    if ($deployCloud -eq "Y" -or $deployCloud -eq "y") {
+        # Check Python is installed
+        $pythonInstalled = Get-Command python -ErrorAction SilentlyContinue
+        if (-not $pythonInstalled) {
+            Write-Host "[WARN] Python not detected. Installing Python via winget..." -ForegroundColor Yellow
+            winget install Python.Python.3 --silent --accept-package-agreements --accept-source-agreements
+        }
+        
+        Write-Host "`n[DEPLOY] Running automated Hugging Face deployer script..." -ForegroundColor Cyan
+        python deploy_hf.py
+        Read-Host "`nCloud Setup completed! Press Enter to exit..."
+        Exit
     }
 
     Write-Host "`n==============================================" -ForegroundColor Green
