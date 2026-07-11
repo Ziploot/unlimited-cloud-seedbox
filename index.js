@@ -38,7 +38,12 @@ app.post('/api/add', (req, res) => {
 
   let engine;
   try {
-    engine = torrentStream(magnet, { tmp: tmpDir, path: dataDir });
+    engine = torrentStream(magnet, {
+      tmp: tmpDir,
+      path: dataDir,
+      connections: 100, // Limit connections to prevent CPU throttling on Render free tier
+      uploads: 0        // Disable uploads to save bandwidth and CPU entirely for download/stream
+    });
   } catch (err) {
     console.error('Failed to create engine:', err.message);
     return res.status(500).json({ error: 'Failed to start torrent: ' + err.message });
