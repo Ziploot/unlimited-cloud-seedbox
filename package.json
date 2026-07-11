@@ -1,7 +1,7 @@
 {
   "name": "unlimited-cloud-seedbox",
   "version": "1.0.0",
-  "description": "Unlimited Private Cloud Seedbox on Hugging Face Spaces",
+  "description": "Unlimited Private Cloud Seedbox on Render",
   "type": "module",
   "main": "index.js",
   "scripts": {
