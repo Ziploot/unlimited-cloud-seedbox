@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: unlimited-cloud-seedbox
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
