@@ -21,7 +21,7 @@ try {
     Set-Location $projectFolder
 
     Write-Host "`n==============================================" -ForegroundColor Green
-    Write-Host "⚡ OPTION 1: 1-Click Cloud Deployment (Render - $0 Free Hosting)" -ForegroundColor Green
+    Write-Host "⚡ OPTION 1: 1-Click Cloud Deployment (Render - `$0 Free Hosting)" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
     Write-Host "The absolute easiest way! Deploy to the cloud in 10 seconds for `$0:" -ForegroundColor Cyan
     Write-Host "1. Log into Render (or sign up for free)."
@@ -51,7 +51,7 @@ try {
         cmd.exe /c "npm install"
 
         Write-Host "`n[START] Launching Local Seedbox Server..." -ForegroundColor Cyan
-        # Start the node server in a hidden background window (default port 3000)
+        # Start the node server in a hidden background window (default port 7860)
         Start-Process -FilePath "node" -ArgumentList "index.js" -WorkingDirectory $projectFolder -WindowStyle Hidden
         Start-Sleep -Seconds 2
 
