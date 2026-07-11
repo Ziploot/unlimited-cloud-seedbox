@@ -6,6 +6,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 7860;
 
+// Log every request so we can debug
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -193,7 +199,7 @@ function getHtmlDashboard() {
     async function addTorrent() {
       const magnet = document.getElementById("magnetLink").value.trim();
       if (!magnet) return alert("Please paste a magnet link first!");
-      if (!magnet.startsWith("magnet:")) return alert("❌ That is not a magnet link!\\n\\nA magnet link must start with:\\nmagnet:?xt=urn:btih:...\\n\\nCheck the torrent site and right-click the 🧲 button → Copy Link Address.");
+      if (!magnet.startsWith("magnet:")) return alert("❌ Invalid Magnet Link! It must start with magnet:?xt=urn:btih:");
       const btn = document.querySelector('.btn');
       btn.textContent = 'ADDING...'; btn.disabled = true;
       try {
