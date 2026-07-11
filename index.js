@@ -1,6 +1,7 @@
 const express = require('express');
 const torrentStream = require('torrent-stream');
-const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 7860;
@@ -25,12 +26,18 @@ app.post('/api/add', (req, res) => {
     return res.json(getEngineMetadata(id, engines.get(id)));
   }
 
-  const engine = torrentStream(magnet, {
-    tmp: '/tmp/seedbox-tmp',
-    path: '/tmp/seedbox-data/' + id
-  });
+  const tmpDir = path.join(os.tmpdir(), 'seedbox-tmp');
+  const dataDir = path.join(os.tmpdir(), 'seedbox-data', id);
 
-  const stored = { engine, magnet, name: null, files: [], ready: false };
+  let engine;
+  try {
+    engine = torrentStream(magnet, { tmp: tmpDir, path: dataDir });
+  } catch (err) {
+    console.error('Failed to create engine:', err.message);
+    return res.status(500).json({ error: 'Failed to start torrent: ' + err.message });
+  }
+
+  const stored = { engine, magnet, name: null, files: [], ready: false, error: null };
   engines.set(id, stored);
 
   engine.on('ready', () => {
@@ -38,12 +45,16 @@ app.post('/api/add', (req, res) => {
     stored.files = engine.files || [];
     stored.ready = true;
     engine.files.forEach(file => file.select());
-    console.log('Torrent ready:', stored.name);
+    console.log('[READY] Torrent:', stored.name, '| Files:', stored.files.length);
   });
 
-  engine.on('error', err => console.error('Engine error:', err.message));
+  engine.on('error', err => {
+    console.error('[ERROR] Engine:', err.message);
+    stored.error = err.message;
+  });
 
-  setTimeout(() => res.json(getEngineMetadata(id, stored)), 500);
+  // Return immediately — frontend polls /api/status every 2s for updates
+  res.json({ id, status: 'added', message: 'Torrent queued. Connecting to peers...' });
 });
 
 app.get('/api/status', (req, res) => {
@@ -99,21 +110,27 @@ app.delete('/api/delete/:id', (req, res) => {
 
 function getEngineMetadata(id, stored) {
   const engine = stored.engine;
-  const swarm = engine.swarm;
   let downloadSpeed = '0.00', numPeers = 0, progress = '0.00';
-  if (swarm) {
-    downloadSpeed = (swarm.downloadSpeed() / (1024 * 1024)).toFixed(2);
-    numPeers = swarm.wires ? swarm.wires.length : 0;
-  }
-  if (engine.torrent && engine.torrent.pieces) {
-    const total = engine.torrent.pieces.length;
-    const have = engine.torrent.pieces.filter(p => p === null).length;
-    progress = total > 0 ? ((have / total) * 100).toFixed(2) : '0.00';
-  }
+  try {
+    const swarm = engine.swarm;
+    if (swarm) {
+      downloadSpeed = typeof swarm.downloadSpeed === 'function'
+        ? (swarm.downloadSpeed() / (1024 * 1024)).toFixed(2)
+        : '0.00';
+      numPeers = (swarm.wires || []).length;
+    }
+    if (engine.torrent && engine.torrent.pieces) {
+      const total = engine.torrent.pieces.length;
+      const have = engine.torrent.pieces.filter(p => p === null).length;
+      progress = total > 0 ? ((have / total) * 100).toFixed(2) : '0.00';
+    }
+  } catch(e) { /* swarm not ready yet */ }
+
   return {
     id, infoHash: id,
-    name: stored.name || 'Loading metadata...',
+    name: stored.name || 'Connecting to peers...',
     progress, downloadSpeed, numPeers,
+    error: stored.error || null,
     files: (stored.files || []).map((f, index) => ({
       name: f.name,
       size: (f.length / (1024 * 1024)).toFixed(2),
@@ -175,27 +192,42 @@ function getHtmlDashboard() {
   <script>
     async function addTorrent() {
       const magnet = document.getElementById("magnetLink").value.trim();
-      if (!magnet) return;
-      const res = await fetch('/api/add', { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({magnet}) });
-      if (res.ok) { document.getElementById("magnetLink").value=""; loadStatus(); }
-      else alert("Error adding torrent.");
+      if (!magnet) return alert("Please paste a magnet link first!");
+      if (!magnet.startsWith("magnet:")) return alert("❌ That is not a magnet link!\\n\\nA magnet link must start with:\\nmagnet:?xt=urn:btih:...\\n\\nCheck the torrent site and right-click the 🧲 button → Copy Link Address.");
+      const btn = document.querySelector('.btn');
+      btn.textContent = 'ADDING...'; btn.disabled = true;
+      try {
+        const res = await fetch('/api/add', { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({magnet}) });
+        const data = await res.json();
+        if (!res.ok) { alert("❌ Error: " + (data.error || "Failed to add torrent")); }
+        else { document.getElementById("magnetLink").value=""; }
+      } catch(e) { alert("❌ Could not connect to server: " + e.message); }
+      btn.textContent = 'ADD TORRENT'; btn.disabled = false;
+      loadStatus();
     }
     async function loadStatus() {
-      const res = await fetch('/api/status');
-      const torrents = await res.json();
-      const listDiv = document.getElementById("torrentList");
-      if (!torrents.length) { listDiv.innerHTML="<p style='color:#64748b;font-size:14px;'>No active torrents. Paste a magnet link above to start.</p>"; return; }
-      listDiv.innerHTML="";
-      torrents.forEach(function(t) {
-        const item = document.createElement("div");
-        item.className="torrent-item";
-        let fileItems="";
-        t.files.forEach(function(f) {
-          fileItems+='<div class="file-item"><span>📁 '+f.name+' ('+f.size+' MB)</span><div><a href="/stream/'+t.id+'/'+f.index+'" target="_blank">Stream/Download</a></div></div>';
+      try {
+        const res = await fetch('/api/status');
+        const torrents = await res.json();
+        const listDiv = document.getElementById("torrentList");
+        if (!torrents.length) { listDiv.innerHTML="<p style='color:#64748b;font-size:14px;'>No active torrents. Paste a magnet link above to start.</p>"; return; }
+        listDiv.innerHTML="";
+        torrents.forEach(function(t) {
+          const item = document.createElement("div");
+          item.className="torrent-item";
+          let fileItems="";
+          if (t.files && t.files.length) {
+            t.files.forEach(function(f) {
+              fileItems+='<div class="file-item"><span>📁 '+f.name+' ('+f.size+' MB)</span><div><a href="/stream/'+t.id+'/'+f.index+'" target="_blank">⬇ Stream/Download</a></div></div>';
+            });
+          } else {
+            fileItems='<div style="color:#64748b;font-size:13px;padding:10px 0;">⏳ Searching for peers and fetching metadata...</div>';
+          }
+          const errorHtml = t.error ? '<div style="color:#ef4444;font-size:13px;margin-bottom:10px;">⚠️ '+t.error+'</div>' : '';
+          item.innerHTML='<div class="torrent-header"><span class="torrent-title">⚡ '+t.name+'</span><button class="btn-delete" onclick="deleteTorrent(\''+t.id+'\')">Remove</button></div>'+errorHtml+'<div class="stats"><span>Peers: '+t.numPeers+'</span><span>Speed: '+t.downloadSpeed+' MB/s</span><span>Progress: '+t.progress+'%</span></div><div class="progress-bar-wrapper"><div class="progress-bar" style="width:'+t.progress+'%"></div></div><div class="file-list">'+fileItems+'</div>';
+          listDiv.appendChild(item);
         });
-        item.innerHTML='<div class="torrent-header"><span class="torrent-title">⚡ '+(t.name||'Loading...')+'</span><button class="btn-delete" onclick="deleteTorrent(\''+t.id+'\')">Remove</button></div><div class="stats"><span>Peers: '+t.numPeers+'</span><span>Speed: '+t.downloadSpeed+' MB/s</span><span>Progress: '+t.progress+'%</span></div><div class="progress-bar-wrapper"><div class="progress-bar" style="width:'+t.progress+'%"></div></div><div class="file-list">'+fileItems+'</div>';
-        listDiv.appendChild(item);
-      });
+      } catch(e) { console.error('Status poll error:', e); }
     }
     async function deleteTorrent(id) {
       if (confirm("Remove this torrent?")) { await fetch('/api/delete/'+id,{method:"DELETE"}); loadStatus(); }
