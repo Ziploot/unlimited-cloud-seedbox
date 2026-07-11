@@ -3,7 +3,7 @@ import WebTorrent from 'webtorrent';
 import path from 'path';
 
 const app = express();
-const PORT = process.env.PORT || 7860;
+const PORT = process.env.PORT || 7860; // Port 7860 is default to avoid port conflicts
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -300,40 +300,40 @@ function getHtmlDashboard() {
         
         let fileItems = "";
         t.files.forEach(f => {
-          fileItems += `
+          fileItems += \`
             <div class="file-item">
-              <span>📁 ${f.name} (${f.size} MB)</span>
+              <span>📁 \${f.name} (\${f.size} MB)</span>
               <div>
-                <a href="/stream/${t.infoHash}/${f.index}" target="_blank">Stream/Download</a>
+                <a href="/stream/\${t.infoHash}/\${f.index}" target="_blank">Stream/Download</a>
               </div>
             </div>
-          `;
+          \`;
         });
 
-        item.innerHTML = `
+        item.innerHTML = \`
           <div class="torrent-header">
-            <span class="torrent-title">⚡ ${t.name || 'Loading Metadata...'}</span>
-            <button class="btn-delete" onclick="deleteTorrent('${t.infoHash}')">Remove</button>
+            <span class="torrent-title">⚡ \${t.name || 'Loading Metadata...'}</span>
+            <button class="btn-delete" onclick="deleteTorrent('\${t.infoHash}')">Remove</button>
           </div>
           <div class="stats">
-            <span>Peers: ${t.numPeers}</span>
-            <span>Speed: ${t.downloadSpeed} MB/s</span>
-            <span>Progress: ${t.progress}%</span>
+            <span>Peers: \${t.numPeers}</span>
+            <span>Speed: \${t.downloadSpeed} MB/s</span>
+            <span>Progress: \${t.progress}%</span>
           </div>
           <div class="progress-bar-wrapper">
-            <div class="progress-bar" style="width: ${t.progress}%"></div>
+            <div class="progress-bar" style="width: \${t.progress}%"></div>
           </div>
           <div class="file-list">
-            ${fileItems}
+            \${fileItems}
           </div>
-        `;
+        \`;
         listDiv.appendChild(item);
       });
     }
 
     async function deleteTorrent(infoHash) {
       if (confirm("Remove this torrent from cloud?")) {
-        await fetch(`/api/delete/${infoHash}`, { method: 'DELETE' });
+        await fetch(\`/api/delete/\${infoHash}\`, { method: "DELETE" });
         loadStatus();
       }
     }
