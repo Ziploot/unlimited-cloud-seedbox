@@ -7,7 +7,9 @@ const PORT = process.env.PORT || 7860;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const client = new WebTorrent();
+// wrtc: false disables WebRTC (node-datachannel) which is not needed for a server seedbox.
+// TCP/UDP peers work perfectly without WebRTC.
+const client = new WebTorrent({ tracker: { wrtc: false } });
 
 app.get('/', (req, res) => {
   res.send(getHtmlDashboard());
