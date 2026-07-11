@@ -312,7 +312,7 @@ function getHtmlDashboard() {
 
         item.innerHTML = `
           <div class="torrent-header">
-            <span class="torrent-title">⚡ \${t.name || 'Loading Metadata...'}</span>
+            <span class="torrent-title">⚡ ${t.name || 'Loading Metadata...'}</span>
             <button class="btn-delete" onclick="deleteTorrent('${t.infoHash}')">Remove</button>
           </div>
           <div class="stats">
@@ -324,7 +324,7 @@ function getHtmlDashboard() {
             <div class="progress-bar" style="width: ${t.progress}%"></div>
           </div>
           <div class="file-list">
-            \${fileItems}
+            ${fileItems}
           </div>
         `;
         listDiv.appendChild(item);
