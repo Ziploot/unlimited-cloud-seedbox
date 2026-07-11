@@ -1,14 +1,14 @@
 {
   "name": "unlimited-cloud-seedbox",
   "version": "1.0.0",
+  "description": "Unlimited Private Cloud Seedbox on Hugging Face Spaces",
   "type": "module",
-  "description": "Infinite Cloud Seedbox Webapp for Hugging Face Spaces",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "webtorrent": "^2.1.25"
+    "webtorrent": "^2.0.0"
   }
 }
