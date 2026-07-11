@@ -3,7 +3,7 @@ import WebTorrent from 'webtorrent';
 import path from 'path';
 
 const app = express();
-const PORT = process.env.PORT || 7860; // Port 7860 is mandatory for Hugging Face Spaces
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
