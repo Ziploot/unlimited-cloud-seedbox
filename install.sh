@@ -49,9 +49,9 @@ if [ "$RUN_LOCAL" = "y" ] || [ "$RUN_LOCAL" = "Y" ]; then
     
     echo -e "\n[BROWSER] Opening Local Seedbox Dashboard..."
     if command -v xdg-open > /dev/null; then
-        xdg-open "http://localhost:3000"
+        xdg-open "http://localhost:7860"
     elif command -v open > /dev/null; then
-        open "http://localhost:3000"
+        open "http://localhost:7860"
     fi
     
     echo ""
