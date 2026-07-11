@@ -26,4 +26,4 @@ To run the seedbox server locally on your machine:
    npm install
    npm start
    ```
-3. Open `http://localhost:3000` in your browser.
+3. Open `http://localhost:7860` in your browser.
