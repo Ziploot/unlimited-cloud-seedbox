@@ -1,21 +1,19 @@
 # Unlimited Private Cloud Seedbox ($0 Setup)
 
-A serverless cloud seedbox deployed on Hugging Face Spaces (Docker SDK) that allows you to download torrents via magnet links at gigabit cloud speeds and stream video/audio directly in the browser.
+A serverless cloud seedbox deployed on Render (Free Tier) that allows you to download torrents via magnet links at gigabit cloud speeds and stream video/audio directly in the browser.
 
 ---
 
 ## ⚡ Deployment Options
 
-### Option 1: 1-Click Cloud Deployment (Hugging Face Spaces) - RECOMMENDED
+### Option 1: 1-Click Cloud Deployment (Render) - RECOMMENDED
 Host your private seedbox in the cloud for free ($0 Operational cost, zero maintenance).
 
-1. Log into your **Hugging Face** account.
-2. Open the template space duplication link:
-   👉 **[Duplicate Space Template](https://huggingface.co/spaces/Ziploot/unlimited-cloud-seedbox?duplicate=true)**
-3. Name your space (e.g., `my-private-seedbox`).
-4. **IMPORTANT:** Set the space visibility to **PRIVATE** (so your downloads and streams remain completely private to you!).
-5. Click **Duplicate Space**.
-6. **Done!** Hugging Face will automatically build and start your container. Your private seedbox is ready!
+1. Log into your **Render** account.
+2. Click the 1-Click deploy link:
+   👉 **[Deploy to Render](https://render.com/deploy?repo=https://github.com/Ziploot/unlimited-cloud-seedbox)**
+3. Name your service (e.g., `unlimited-cloud-seedbox`) and click **Create Web Service**.
+4. **Done!** Render will automatically build and start your container. Your private seedbox is ready!
 
 ---
 
@@ -28,4 +26,4 @@ To run the seedbox server locally on your machine:
    npm install
    npm start
    ```
-3. Open `http://localhost:7860` in your browser.
+3. Open `http://localhost:3000` in your browser.
